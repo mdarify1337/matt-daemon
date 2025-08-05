@@ -5,17 +5,45 @@
 #include <chrono>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <cstdlib>
+#include <errno.h>
+#include <cstring>
+#include <asm-generic/fcntl.h>
 
-const std::string TintinReporter::LOG_DIR = "/var/log/matt_daemon/";
+
+const std::string TintinReporter::LOG_DIR = "/var/lock/matt_daemon/";  // <-- use /tmp or $HOME for dev
 const std::string TintinReporter::LOG_FILE = LOG_DIR + "matt_daemon.log";
 
 TintinReporter::TintinReporter()
 {
-    createLogDirectory();
+    // Use home directory for logs
+    // const char *home = std::getenv("HOME");
+    // std::string logPath =  + "/matt_daemon.log";
+    
+    // std::cout << "Attempting to create log file at: " << logPath << std::endl;
     logFile.open(LOG_FILE, std::ios::app);
+    
     if (!logFile.is_open())
     {
-        std::cerr << "Failed to open log file: " << LOG_FILE << std::endl;
+        // Fallback to current directory
+        std::string fallbackPath = "./matt_daemon.log";
+        std::cerr << "Failed to open home log file: " <<  fallbackPath
+                  << ", trying current directory: " << fallbackPath << std::endl;
+        
+        logFile.open(fallbackPath, std::ios::app);
+        
+        if (!logFile.is_open())
+        {
+            std::cerr << "Failed to open fallback log file: " << fallbackPath << std::endl;
+        }
+        else
+        {
+            std::cout << "Log file created at: " << fallbackPath << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Log file created at: " << LOG_FILE << std::endl;
     }
 }
 
@@ -30,8 +58,15 @@ TintinReporter::~TintinReporter()
 TintinReporter::TintinReporter(const TintinReporter &other)
 {
     (void)other;
-    createLogDirectory();
+    // const char *home = std::getenv("HOME");
+    // std::string logPath = (home ? std::string(home) : ".") + "/matt_daemon.log";
     logFile.open(LOG_FILE, std::ios::app);
+    
+    if (!logFile.is_open())
+    {
+        std::string fallbackPath = "./matt_daemon.log";
+        logFile.open(fallbackPath, std::ios::app);
+    }
 }
 
 TintinReporter &TintinReporter::operator=(const TintinReporter &other)
@@ -56,13 +91,12 @@ void TintinReporter::createLogDirectory()
         mkdir(LOG_DIR.c_str(), 0755);
     }
 }
-
 std::string TintinReporter::getCurrentTimestamp()
 {
     auto now = std::chrono::system_clock::now();
     auto time_t = std::chrono::system_clock::to_time_t(now);
     auto tm = *std::localtime(&time_t);
-
+    
     std::stringstream ss;
     ss << "[" << std::setfill('0') << std::setw(2) << tm.tm_mday << "/"
        << std::setw(2) << (tm.tm_mon + 1) << "/" << (tm.tm_year + 1900) << "-"
@@ -89,12 +123,17 @@ std::string TintinReporter::levelToString(LogLevel level)
 void TintinReporter::log(LogLevel level, const std::string &message)
 {
     std::lock_guard<std::mutex> lock(logMutex);
+    
     if (logFile.is_open())
     {
         logFile << getCurrentTimestamp() << " " << levelToString(level)
                 << " - " << message << std::endl;
         logFile.flush();
     }
+    
+    // Also output to console for debugging
+    std::cout << getCurrentTimestamp() << " " << levelToString(level)
+              << " - " << message << std::endl;
 }
 
 TintinReporter &TintinReporter::getInstance()

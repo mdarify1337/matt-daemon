@@ -18,7 +18,6 @@ public:
     ~TintinReporter();
     TintinReporter(const TintinReporter &other);
     TintinReporter &operator=(const TintinReporter &other);
-
     void log(LogLevel level, const std::string &message);
     static TintinReporter &getInstance();
 

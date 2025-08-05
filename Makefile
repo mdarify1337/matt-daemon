@@ -1,5 +1,5 @@
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++20
+CXXFLAGS = -Wall -Wextra -Werror -std=c++20 -fsanitize=address
 SRCDIR = src
 SOURCES = $(SRCDIR)/main.cpp $(SRCDIR)/MattDaemon.cpp $(SRCDIR)/TintinReporter.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
