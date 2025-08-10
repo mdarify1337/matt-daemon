@@ -1,4 +1,0 @@
-[10/08/2025-09:25:54] [ INFO ] - Matt_daemon: Starting up
-[10/08/2025-09:25:54] [ ERROR ] - Matt_daemon: Error - daemon already running or file locked.
-[10/08/2025-09:25:54] [ ERROR ] - Matt_daemon: Failed to create lock file, quitting
-[10/08/2025-09:25:54] [ INFO ] - Matt_daemon: Cleaning up and quitting

@@ -82,8 +82,6 @@ void MattDaemon::removeLockFile()
 void MattDaemon::daemonize()
 {
     logger.log(TintinReporter::INFO, "Matt_daemon: Entering Daemon mode.");
-    
-    // First fork
     pid_t pid = fork();
     if (pid < 0)
     {
@@ -92,20 +90,14 @@ void MattDaemon::daemonize()
     }
     if (pid > 0)
     {
-        exit(EXIT_SUCCESS); // Parent exits
+        exit(EXIT_SUCCESS);
     }
-
-    
     if (setsid() < 0)
     {
         logger.log(TintinReporter::ERROR, "Matt_daemon: setsid failed.");
         exit(EXIT_FAILURE);
     }
-
-    // Ignore SIGHUP
     signal(SIGHUP, SIG_IGN);
-
-    // Second fork
     pid = fork();
     if (pid < 0)
     {
@@ -114,10 +106,8 @@ void MattDaemon::daemonize()
     }
     if (pid > 0)
     {
-        exit(EXIT_SUCCESS); // Parent exits
+        exit(EXIT_SUCCESS);
     }
-
-    // Change working directory to home instead of root
     const char *home = getenv("HOME");
     if (home && chdir(home) < 0)
     {
@@ -128,16 +118,10 @@ void MattDaemon::daemonize()
             exit(EXIT_FAILURE);
         }
     }
-
-    // Set file permissions
     umask(0);
-
-    // Close standard file descriptors
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
-
-    // Redirect standard file descriptors to /dev/null
     int devNull = open("/dev/null", O_RDWR);
     if (devNull != -1)
     {
@@ -426,7 +410,7 @@ void MattDaemon::run()
     }
     setupSignalHandlers();
     std::cout << "Skipping daemonization for debugging..." << std::endl;
-    // daemonize();
+    daemonize();
     handleConnections();
     cleanup();
 }
