@@ -13,7 +13,7 @@
 #include <cstdlib>
 
 // Use local paths instead of system paths
-const std::string MattDaemon::LOCK_FILE = "/home/mdarify/Desktop/matt_daemon.lock";
+const std::string MattDaemon::LOCK_FILE = "/var/lock/matt_daemon.lock";
 MattDaemon *MattDaemon::instance = nullptr;
 std::atomic<bool> MattDaemon::running{true};
 
@@ -410,12 +410,12 @@ void MattDaemon::run()
 
     std::cout << "Skipping root privilege check for testing..." << std::endl;
 
-    if (!createLockFile())
-    {
-        std::cerr << "Failed to create lock file, quitting" << std::endl;
-        logger.log(TintinReporter::ERROR, "Matt_daemon: Failed to create lock file, quitting");
-        return;
-    }
+    // if (!createLockFile())
+    // {
+    //     std::cerr << "Failed to create lock file, quitting" << std::endl;
+    //     logger.log(TintinReporter::ERROR, "Matt_daemon: Failed to create lock file, quitting");
+    //     return;
+    // }
 
     if (!createServer())
     {

@@ -17,7 +17,7 @@ public:
     static void signalHandler(int signal);
 
 private:
-    static const int PORT = 4244;
+    static const int PORT = 4247;
     static const int MAX_CLIENTS = 3;
     static const std::string LOCK_FILE;
     static MattDaemon *instance;

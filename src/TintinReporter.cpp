@@ -11,7 +11,7 @@
 #include <asm-generic/fcntl.h>
 
 
-const std::string TintinReporter::LOG_DIR = "/var/lock/matt_daemon/";  // <-- use /tmp or $HOME for dev
+const std::string TintinReporter::LOG_DIR = "/var/log/matt_daemon/";  // <-- use /tmp or $HOME for dev
 const std::string TintinReporter::LOG_FILE = LOG_DIR + "matt_daemon.log";
 
 TintinReporter::TintinReporter()
@@ -26,7 +26,7 @@ TintinReporter::TintinReporter()
     if (!logFile.is_open())
     {
         // Fallback to current directory
-        std::string fallbackPath = "./matt_daemon.log";
+        std::string fallbackPath = "/var/log/matt_daemon/matt_daemon.log";
         std::cerr << "Failed to open home log file: " <<  fallbackPath
                   << ", trying current directory: " << fallbackPath << std::endl;
         
